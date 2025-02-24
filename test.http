@@ -1,0 +1,4 @@
+curl -X OPTIONS https://localhost:8080/api/Subscription/Get?USER_ID=123 \
+-H "Origin: https://a501-211-72-13-8.ngrok-free.app" \
+-H "Access-Control-Request-Method: GET" \
+-H "Access-Control-Request-Headers: content-type"

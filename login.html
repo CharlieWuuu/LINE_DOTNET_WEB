@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>LINE Login</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:image" content="/images/image.jpg" />
+	<!-- jquery CDN include -->
+	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+	<!-- CSS include -->
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<!-- 最上方的 bar -->
+	<div class="topnav">
+		<a href="/login.html">Line Login</a>
+		<a href="/profile.html">User Profile</a>
+		<!-- <a href="/products.html">Line Pay</a> -->
+	</div>
+	<!-- 按鈕 -->
+	<div class="container">
+		<!-- 使用了三個 function，分別為：滑鼠移入時切換圖片、滑鼠移出時切換圖片、被點擊時送出登入請求 -->
+		<input type="image" src="images/btn_login_base.png" onmousemove="hover(this)" onmouseout="unhover(this)" onclick="login()">
+	</div>
+	<script>
+		let apiUrl = 'https://00ae-211-72-13-8.ngrok-free.app';
+		let url = 'https://ac37-211-72-13-8.ngrok-free.app';
+		let baseLoginApiUrl = apiUrl + '/api/LineLogin/'
+		// 登入 function
+		function login() {
+			// 向我們的伺服器送出 request，取得 Line Login 頁面網址。
+			$.get({
+				url: baseLoginApiUrl + 'Url' + "?redirectUrl=" + url + "/profile.html",
+				headers: { 'ngrok-skip-browser-warning': 'true' },  // 添加此請求頭部來跳過警告頁面
+				contentType: "application/json;charset=utf-8",
+				success: function (result) {
+					window.location = result; //取得網址並跳轉。
+				},
+			})
+		}
+
+		// 變更圖片 function
+		function hover(element) {
+			element.setAttribute('src', 'images/btn_login_hover.png');
+		}
+		function unhover(element) {
+			element.setAttribute('src', 'images/btn_login_base.png');
+		}
+	</script>
+</body>
+
+</html>

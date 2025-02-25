@@ -123,8 +123,8 @@
 		<div v-if="isVerified" class="subscriptionContainer">
 			<h1>請選擇欲訂閱的資訊</h1>
 			<div v-if="isVerified" class="subscriptionBtnContainer">
-				<div v-for="(status, key) in subscriptions" :key="key" class="subscriptionBtn" @click="toggleSubscription(key)" id="{{ key }}">
-					<p>{{ subscriptionNames[key] }}</p>
+				<div v-for="(status, key) in subscriptions" :key="key" class="subscriptionBtn" @click="toggleSubscription(key)">
+					<p>{{ subscriptionNames[key] }}，{{ key }}</p>
 					<span>{{ status ? '取消訂閱' : '訂閱' }}</span>
 				</div>
 				<div class="subscriptionBtn">

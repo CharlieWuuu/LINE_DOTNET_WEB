@@ -125,7 +125,7 @@
 			<div v-if="isVerified" class="subscriptionBtnContainer">
 				<div v-for="(status, key) in subscriptions" :key="key" class="subscriptionBtn" @click="toggleSubscription(key)">
 					<p>{{ subscriptionNames[key] }}</p>
-					<span>{{ status ? '取消訂閱' : '訂閱' }}</span>
+					<span>{{ status == 1 ? '已訂閱' : '未訂閱' }}</span>
 				</div>
 				<div class="subscriptionBtn">
 					<p @click="shareTargetPicker()">分享此帳號</p>
@@ -150,9 +150,9 @@
 				let isSending = ref(false);
 				let hasSentCode = ref(false);
 				let subscriptions = ref({
-					oceaN_POLLUTION: false,
-					oiL_REPORT: false,
-					satellitE_IMAGES: false
+					oceaN_POLLUTION: 0,
+					oiL_REPORT: 0,
+					satellitE_IMAGES: 0
 				});
 
 				let subscriptionNames = {

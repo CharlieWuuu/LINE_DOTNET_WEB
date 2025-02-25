@@ -259,7 +259,9 @@
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({ USER_ID: userId.value })
 					});
+					console.log(subscriptions.value);
 					subscriptions.value = await res.json();
+					console.log(subscriptions.value);
 				}
 
 				async function toggleSubscription(key) {

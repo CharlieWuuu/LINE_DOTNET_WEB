@@ -187,11 +187,13 @@
 						if (data.COMBINE_LINE) {
 							// 自動儲存使用者登入紀錄
 							isVerified.value = true;
+							return isVerified.value;
 						}
+						return false;
 					} catch (err) {
 						console.error('❌ 檢查使用者失敗:', err);
+						return false;
 					}
-					return isVerified.value;
 				}
 
 				async function sendVerifyCode() {
@@ -232,7 +234,6 @@
 							body: JSON.stringify({ EMAIL: email.value, CODE: verifyCode.value })
 						});
 						let data = await res.json();
-						console.log(data)
 						if (data) {
 							LoginUser();
 						} else {
@@ -247,7 +248,7 @@
 					await fetch(apiUrl + '/api/LineLogin/LoginUser', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ EMAIL: email.value, LINE_ID: userId.value, LINE_DISPLAY_NAME: userName.value })
+						body: JSON.stringify({ LINE_ID: userId.value, LINE_DISPLAY_NAME: userName.value })
 					});
 					isVerified.value = true;
 					fetchSubscriptions();

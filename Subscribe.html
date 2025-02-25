@@ -179,6 +179,7 @@
 				}
 
 				async function checkUserExists() {
+					console.log(userId.value);
 					try {
 						let res = await fetch(apiUrl + '/api/LineLogin/CheckUserCombineLine', {
 							method: 'POST',
@@ -186,7 +187,7 @@
 							body: JSON.stringify({ LINE_ID: userId.value })
 						});
 						let data = await res.json();
-						if (data.COMBINE_LINE) {
+						if (data) {
 							// 自動儲存使用者登入紀錄
 							isVerified.value = true;
 							return true;

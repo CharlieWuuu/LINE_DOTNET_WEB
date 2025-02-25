@@ -172,6 +172,7 @@
 					if (checkUserExists()) {
 						LoginUser();
 					}
+					console.log(checkUserExists())
 				}
 
 				async function checkUserExists() {
@@ -182,13 +183,13 @@
 							body: JSON.stringify({ LINE_ID: userId.value })
 						});
 						let data = await res.json();
-						console.log(data)
-						if (data.COMBINE_LINE == 1) {
+						if (data.COMBINE_LINE) {
 							// 自動儲存使用者登入紀錄
 							isVerified.value = true;
 							return isVerified.value;
+						} else {
+							return false;
 						}
-						return false;
 					} catch (err) {
 						console.error('❌ 檢查使用者失敗:', err);
 						return false;

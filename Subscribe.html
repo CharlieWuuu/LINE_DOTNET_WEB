@@ -8,6 +8,7 @@
 	<title>示警通報預定</title>
 	<meta property="og:description" content="衛星影像分析資訊平台" />
 	<meta property="og:image" content="/images/OIL.png" />
+	<link rel="icon" href="/images/OIL.png" type="image/x-icon">
 
 	<!-- LIFF SDK -->
 	<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -122,7 +123,7 @@
 		<!-- 訂閱功能 -->
 		<div v-if="isVerified" class="subscriptionContainer">
 			<h1>請選擇欲訂閱的資訊</h1>
-			<div v-if="isVerified" class="subscriptionBtnContainer">
+			<div class="subscriptionBtnContainer">
 				<div v-for="(status, key) in subscriptions" :key="key" class="subscriptionBtn" @click="toggleSubscription(key)">
 					<p>{{ subscriptionNames[key] }}</p>
 					<span>{{ status == 1 ? '已訂閱' : '未訂閱' }}</span>
@@ -186,7 +187,7 @@
 						if (data.COMBINE_LINE) {
 							// 自動儲存使用者登入紀錄
 							isVerified.value = true;
-							return isVerified.value;
+							return true;
 						} else {
 							return false;
 						}

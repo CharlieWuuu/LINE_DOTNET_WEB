@@ -14,14 +14,10 @@
 	<!-- Vue CDN -->
 	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 	<!-- CSS -->
-	<style>
+	<style lang="scss">
 		body {
-			padding: 40px 20px;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			gap: 40px;
+			padding: 0;
+			margin: 0;
 			background: linear-gradient(to right, #155252, #33747B);
 		}
 
@@ -35,20 +31,54 @@
 
 		.container {
 			width: 100%;
-			max-width: 400px;
+			min-height: 100svh;
 			text-align: center;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 20px;
 		}
 
 		.verifyContainer,
 		.subscriptionContainer {
+			max-width: 360px;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			gap: 10px;
-			background: rgba(255, 255, 255, 0.1);
-			padding: 20px;
 			border-radius: 10px;
-			width: 100%;
+
+
+			.subscriptionBtnContainer {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 20px;
+				width: 100%;
+
+				.subscriptionBtn {
+					min-width: 160px;
+					min-height: 160px;
+					border: 2px solid white;
+					border-radius: 20px;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					justify-content: center;
+					color: white;
+
+					&:hover {
+						background-color: rgba(255, 255, 255, 0.1);
+						cursor: pointer;
+					}
+
+					p {
+						font-size: 22px;
+					}
+				}
+			}
 		}
 
 		input,
@@ -60,18 +90,18 @@
 			width: 100%;
 		}
 
-		button {
-			background-color: white;
-			cursor: pointer;
+		input {
+			width: calc(100% - 20px);
 		}
 
-		.subscriptionBtn {
-			padding: 10px;
-			background: white;
-			color: black;
-			border-radius: 5px;
+		button {
+			background-color: rgba(255, 255, 255, 0.5);
 			cursor: pointer;
-			margin-top: 10px;
+
+			&:disabled {
+				background-color: rgba(255, 255, 255, 0.2);
+				cursor: not-allowed;
+			}
 		}
 	</style>
 </head>
@@ -84,16 +114,22 @@
 		<div v-if="!isVerified" class="verifyContainer">
 			<p>你還沒有驗證唷！請先填入你的信箱</p>
 			<input type="email" v-model="email" placeholder="請輸入 Email">
-			<button @click="sendVerifyCode" :disabled="isSending">寄送驗證碼</button>
-			<input type="number" v-model="verifyCode" placeholder="輸入驗證碼" :disabled="!hasSentCode">
-			<button @click="checkVerifyCode" :disabled="!hasSentCode">驗證</button>
+			<button @click="sendVerifyCode()" :disabled="isSending">{{ hasSentCode ? '再寄一次驗證碼' : ' 寄送驗證碼' }}</button>
+			<input v-if="hasSentCode" type="text" v-model="verifyCode" placeholder="輸入驗證碼" :disabled="!hasSentCode">
+			<button v-if="hasSentCode" @click="checkVerifyCode()" :disabled="!hasSentCode">驗證</button>
 		</div>
 
 		<!-- 訂閱功能 -->
 		<div v-if="isVerified" class="subscriptionContainer">
 			<h1>請選擇欲訂閱的資訊</h1>
-			<div v-for="(status, key) in subscriptions" :key="key" class="subscriptionBtn" :style="{ backgroundColor: status ? 'red' : 'white' }" @click="toggleSubscription(key)">
-				{{ subscriptionNames[key] }} - {{ status ? '取消訂閱' : '訂閱' }}
+			<div v-if="isVerified" class="subscriptionBtnContainer">
+				<div v-for="(status, key) in subscriptions" :key="key" class="subscriptionBtn">
+					<p>{{ subscriptionNames[key] }}</p>
+					<span>{{ status ? '取消訂閱' : '訂閱' }}</span>
+				</div>
+				<div class="subscriptionBtn">
+					<p>分享此帳號</p>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -103,7 +139,7 @@
 
 		createApp({
 			setup() {
-				const apiUrl = 'https://line-dotnet-api.onrender.com/';
+				const apiUrl = 'https://line-dotnet-api.onrender.com';
 				const liffId = '2006807429-YpKnwjVL';
 
 				let userId = ref("");
@@ -125,12 +161,13 @@
 					satellitE_IMAGES: "最新衛星影像"
 				};
 
+				// 進入畫面時自動登入 LIFF
 				async function initLIFF() {
 					await liff.init({ liffId, withLoginOnExternalBrowser: true });
-					const profile = await liff.getProfile();
+					const profile = await liff.getProfile(); // 取得使用者的 LINE 資料
 					userId.value = profile.userId;
 					userName.value = profile.displayName;
-					checkUserExists();
+					checkUserExists(); // 檢查使用者是否已經註冊
 				}
 
 				async function checkUserExists() {
@@ -141,10 +178,10 @@
 							body: JSON.stringify({ LINE_ID: userId.value })
 						});
 						let data = await res.json();
-						isVerified.value = data.exists;
-
-						if (data.exists) {
+						if (data.COMBINE_LINE) {
+							// 自動儲存使用者登入紀錄
 							fetchSubscriptions();
+							isVerified.value = true;
 						}
 					} catch (err) {
 						console.error('❌ 檢查使用者失敗:', err);
@@ -164,7 +201,7 @@
 							body: JSON.stringify({ EMAIL: email.value })
 						});
 						let data = await res.json();
-						if (data.success) {
+						if (data) {
 							hasSentCode.value = true;
 							alert("驗證碼已發送");
 						} else {
@@ -177,6 +214,7 @@
 				}
 
 				async function checkVerifyCode() {
+					console.log(email.value, typeof verifyCode.value);
 					if (!verifyCode.value) {
 						alert("請輸入驗證碼");
 						return;
@@ -188,8 +226,9 @@
 							body: JSON.stringify({ EMAIL: email.value, CODE: verifyCode.value })
 						});
 						let data = await res.json();
-						if (data.success) {
-							saveUserInfo();
+						console.log(data)
+						if (data) {
+							LoginUser();
 						} else {
 							alert("驗證碼錯誤");
 						}
@@ -198,11 +237,11 @@
 					}
 				}
 
-				async function saveUserInfo() {
-					await fetch(apiUrl + '/api/LineLogin/SaveUser', {
+				async function LoginUser() {
+					await fetch(apiUrl + '/api/LineLogin/LoginUser', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ EMAIL: email.value, LINE_ID: userId.value, COMBINE_LINE: 1 })
+						body: JSON.stringify({ EMAIL: email.value, LINE_ID: userId.value, LINE_DISPLAY_NAME: userName.value })
 					});
 					isVerified.value = true;
 					fetchSubscriptions();
@@ -222,7 +261,7 @@
 				}
 
 				initLIFF();
-				return { userName, email, verifyCode, isVerified, subscriptions, subscriptionNames, sendVerifyCode, checkVerifyCode, toggleSubscription };
+				return { userName, email, verifyCode, isVerified, hasSentCode, isSending, subscriptions, subscriptionNames, sendVerifyCode, checkVerifyCode, toggleSubscription };
 			}
 		}).mount("#app");
 	</script>

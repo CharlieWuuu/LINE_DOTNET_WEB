@@ -170,10 +170,11 @@
 					userName.value = profile.displayName;
 
 					// 檢查使用者是否已經註冊
-					if (checkUserExists()) {
+					let isUserExists = await checkUserExists();
+					if (isUserExists) {
 						LoginUser();
 					}
-					console.log(checkUserExists())
+					console.log(isUserExists);
 				}
 
 				async function checkUserExists() {

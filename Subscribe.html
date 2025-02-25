@@ -281,6 +281,7 @@
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({
+							LINE_ID: userId.value,
 							OCEAN_POLLUTION: subscriptions.value.OCEAN_POLLUTION,
 							OIL_REPORT: subscriptions.value.OIL_REPORT,
 							SATELLITE_IMAGES: subscriptions.value.SATELLITE_IMAGES,

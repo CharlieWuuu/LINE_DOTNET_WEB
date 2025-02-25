@@ -1,6 +1,5 @@
-<!-- 本頁面只使用 LIFF SDK -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 
 <head>
 	<meta charset="UTF-8">
@@ -10,217 +9,12 @@
 	<meta property="og:description" content="衛星影像分析資訊平台" />
 	<meta property="og:image" content="/images/OIL.png" />
 
-	<!-- LIFF SDK CDN include -->
-	<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-	<!-- jquery CDN include -->
-	<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
-	<!-- CSS include -->
-	<link rel="stylesheet" href="style.css">
-	<script>
-		let apiUrl = 'https://line-dotnet-api.onrender.com/';
-		let url = 'https://charliewuuu.github.io/LINE_DOTNET_WEB/';
-		let userId = "";
-		window.onload = function () {
-			const defaultLiffId = '2006807429-YpKnwjVL';
-			$(document).ready(async () => {
-				await liffInit(defaultLiffId);
-				$('button').attr('disabled', false);
-				getSubscription();
-			});
-		}
-
-		async function liffInit(liffId) {
-			try {
-				// 初始化 LIFF
-				await liff.init({ liffId: liffId, withLoginOnExternalBrowser: true });
-				console.log("LIFF 初始化與用戶資料處理完成");
-
-				// 取得用戶資料
-				const profile = await liff.getProfile();
-				$("#user_name").text(profile.displayName);
-				userId = profile.userId; // 如果需要將 userId 儲存
-
-				// 呼叫後端 API
-				await sendToBackend(liff);
-			} catch (err) {
-				// 捕獲錯誤並處理
-				console.error("LIFF 初始化失敗", err.code, err.message);
-			}
-		}
-
-		// 傳送資料到後端的函數
-		function sendToBackend(liff) {
-			// 取得環境資訊
-			const os = liff.getOS();
-			const language = liff.getLanguage();
-			const version = liff.getVersion();
-			const lineVersion = liff.getLineVersion();
-			const isInClient = liff.isInClient();
-
-			// 定義資料物件
-			const userData = {};
-
-			// 取得一般的 user profile
-			liff.getProfile().then(function (profile) {
-				// console.log(profile);
-				userData.userProfile = {
-					displayName: profile.displayName || '',
-					userId: profile.userId || '',
-					statusMessage: profile.statusMessage || '',
-					pictureUrl: profile.pictureUrl || ''
-				};
-
-
-				// 取得包在 id token 內的 user profile
-				const idTokenProfile = liff.getDecodedIDToken();
-				// console.log(idTokenProfile);
-				userData.idTokenProfile = {
-					name: idTokenProfile.name || '',
-					email: idTokenProfile.email || '',
-					picture: idTokenProfile.picture || '',
-					iss: idTokenProfile.iss || '',
-					sub: idTokenProfile.sub || '',
-					aud: idTokenProfile.aud || '',
-					exp: idTokenProfile.exp || '',
-					iat: idTokenProfile.iat || '',
-					amr: idTokenProfile.amr || [""]
-				};
-
-				// 環境資訊
-				userData.environment = {
-					os: os,
-					language: language || '',
-					version: version || '',
-					lineVersion: lineVersion || '',
-					isInClient: isInClient == true ? 1 : 0
-				};
-
-				// 傳送資料到後端
-				// $.ajax({
-				// 	url: 'https://0187-211-72-13-8.ngrok-free.app/api/LineLogin/CheckAndSaveUser', // 後端 API 路徑
-				// 	headers: { 'ngrok-skip-browser-warning': 'true' },  // 添加此請求頭部來跳過警告頁面
-				// 	method: 'POST',
-				// 	contentType: 'application/json', // 指定內容類型為 JSON
-				// 	data: JSON.stringify(userData), // 將資料轉換為 JSON 格式
-				// 	success: function (response) {
-				// 		console.log('資料已成功傳送至後端:', response);
-				// 	},
-				// 	error: function (xhr, status, error) {
-				// 		console.error('傳送資料到後端失敗:', error);
-				// 	}
-				// });
-				fetch(apiUrl + '/api/LineLogin/CheckAndSaveUser', {
-					method: 'POST',
-					headers: {
-						'ngrok-skip-browser-warning': 'true',
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify(userData)
-				})
-					.then(response => console.log('Success'))
-					.catch(error => console.log('Error'));
-			}).catch(function (error) {
-				console.error("Error getting profile:", error);
-			});
-		}
-
-
-		function getSubscription() {
-			fetch(apiUrl + '/api/Subscription/Fetch', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ USER_ID: userId })
-			})
-				.then(response => response.json())
-				.then(data => {
-					console.log('資料已成功取得:', data);
-					$('#oceaN_POLLUTION').find('.subscriptionStatus').text(data.oceaN_POLLUTION ? '取消訂閱' : '訂閱');
-					$('#oiL_REPORT').find('.subscriptionStatus').text(data.oiL_REPORT ? '取消訂閱' : '訂閱');
-					$('#satellitE_IMAGES').find('.subscriptionStatus').text(data.satellitE_IMAGES ? '取消訂閱' : '訂閱');
-				})
-				.catch(error => {
-					console.error('Error:', error);
-				});
-		}
-
-		function updateSubscription(e) {
-			const item = $(e)[0].id;
-
-			let subscription = {
-				USER_ID: userId,
-				OCEAN_POLLUTION: $('#oceaN_POLLUTION').find('.subscriptionStatus').text() === '訂閱' ? 0 : 1,
-				OIL_REPORT: $('#oiL_REPORT').find('.subscriptionStatus').text() === '訂閱' ? 0 : 1,
-				SATELLITE_IMAGES: $('#satellitE_IMAGES').find('.subscriptionStatus').text() === '訂閱' ? 0 : 1
-			};
-			subscription[item.toUpperCase()] = subscription[item.toUpperCase()] === 1 ? 0 : 1;
-			$('#' + item).find('.subscriptionStatus').text(subscription[item.toUpperCase()] === 1 ? '取消訂閱' : '訂閱');
-
-
-			fetch(apiUrl + '/api/Subscription/Update', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(subscription)
-			})
-				.then(response => {
-					console.log('資料已成功傳送至後端:', response);
-				})
-				.catch(error => {
-					console.error('Error:', error);
-				});
-		}
-
-		function shareTargetPicker() {
-			if (!liff.isApiAvailable('shareTargetPicker')) {
-				console.log("請檢查 Line 版本是否為 10.3.0 以上")
-				return;
-			}
-			const flexMessage = {
-				type: "flex",
-				altText: "衛星影像分析資訊平台",
-				contents: {
-					type: "bubble",
-					hero: {
-						type: "image",
-						url: url + "/images/OIL.png",
-						size: "full",
-						aspectRatio: "20:13",
-						aspectMode: "cover",
-						action: {
-							type: "uri",
-							uri: "https://line.me/ti/p/@070qbplr"
-						}
-					},
-					body: {
-						type: "box",
-						layout: "vertical",
-						contents: [
-							{
-								type: "text",
-								text: "衛星影像分析資訊平台",
-								weight: "bold",
-								size: "lg",
-								wrap: true,
-							},
-							{
-								type: "text",
-								text: "點擊查看更多資訊",
-								size: "sm",
-								color: "#666666",
-								wrap: true,
-							},
-						],
-						action: {
-							type: "uri",
-							uri: "https://line.me/ti/p/@070qbplr"
-						}
-					},
-				},
-			};
-
-			liff.shareTargetPicker([flexMessage], { isMultiple: true, });
-		}
-	</script>
-	<style lang="scss">
+	<!-- LIFF SDK -->
+	<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+	<!-- Vue CDN -->
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<!-- CSS -->
+	<style>
 		body {
 			padding: 40px 20px;
 			display: flex;
@@ -239,72 +33,199 @@
 			margin: 0;
 		}
 
-		.titleContainer {
+		.container {
+			width: 100%;
+			max-width: 400px;
+			text-align: center;
+		}
+
+		.verifyContainer,
+		.subscriptionContainer {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			justify-content: center;
+			gap: 10px;
+			background: rgba(255, 255, 255, 0.1);
+			padding: 20px;
+			border-radius: 10px;
+			width: 100%;
 		}
 
-		.subscriptionBtnContainer {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			flex-wrap: wrap;
-			gap: 20px;
+		input,
+		button {
+			padding: 10px;
+			font-size: 16px;
+			border-radius: 5px;
+			border: none;
 			width: 100%;
+		}
 
-			.subscriptionBtn {
-				min-width: 160px;
-				min-height: 160px;
-				border: 2px solid white;
-				border-radius: 20px;
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				justify-content: center;
+		button {
+			background-color: white;
+			cursor: pointer;
+		}
 
-
-				&:hover {
-					cursor: pointer;
-				}
-
-				p {
-					font-size: 20px;
-					font-weight: 700;
-				}
-			}
+		.subscriptionBtn {
+			padding: 10px;
+			background: white;
+			color: black;
+			border-radius: 5px;
+			cursor: pointer;
+			margin-top: 10px;
 		}
 	</style>
 </head>
 
 <body>
-	<div class="titleContainer">
-		<h2><a id="user_name"></a>，您好！</h2>
-		<h1>請選擇欲訂閱的資訊</h1>
-	</div>
-	<div class="subscriptionBtnContainer">
-		<!-- QR Code 按鈕 -->
-		<div class="subscriptionBtn" id="oceaN_POLLUTION" onclick="updateSubscription(this)">
-			<p>海洋汙染事件</p>
-			<span class="subscriptionStatus">訂閱</span>
+	<div id="app" class="container">
+		<h2>{{ userName }}，您好！</h2>
+
+		<!-- 驗證區塊 -->
+		<div v-if="!isVerified" class="verifyContainer">
+			<p>你還沒有驗證唷！請先填入你的信箱</p>
+			<input type="email" v-model="email" placeholder="請輸入 Email">
+			<button @click="sendVerifyCode" :disabled="isSending">寄送驗證碼</button>
+			<input type="number" v-model="verifyCode" placeholder="輸入驗證碼" :disabled="!hasSentCode">
+			<button @click="checkVerifyCode" :disabled="!hasSentCode">驗證</button>
 		</div>
 
-		<!-- SendMessage 按鈕 -->
-		<div class="subscriptionBtn" id="oiL_REPORT" onclick="updateSubscription(this)">
-			<p>影像油汙報告</p>
-			<span class="subscriptionStatus">訂閱</span>
-		</div>
-		<!-- ShareTargetPicker 按鈕 -->
-		<div class="subscriptionBtn" id="satellitE_IMAGES" onclick="updateSubscription(this)">
-			<p>最新衛星影像</p>
-			<span class="subscriptionStatus">訂閱</span>
-		</div>
-		<!-- ShareTargetPicker 按鈕 -->
-		<div class="subscriptionBtn" onclick="shareTargetPicker()">
-			<p>分享本帳號</p>
+		<!-- 訂閱功能 -->
+		<div v-if="isVerified" class="subscriptionContainer">
+			<h1>請選擇欲訂閱的資訊</h1>
+			<div v-for="(status, key) in subscriptions" :key="key" class="subscriptionBtn" :style="{ backgroundColor: status ? 'red' : 'white' }" @click="toggleSubscription(key)">
+				{{ subscriptionNames[key] }} - {{ status ? '取消訂閱' : '訂閱' }}
+			</div>
 		</div>
 	</div>
+
+	<script>
+		const { createApp, ref } = Vue;
+
+		createApp({
+			setup() {
+				const apiUrl = 'https://line-dotnet-api.onrender.com/';
+				const liffId = '2006807429-YpKnwjVL';
+
+				let userId = ref("");
+				let userName = ref("");
+				let email = ref("");
+				let verifyCode = ref("");
+				let isVerified = ref(false);
+				let isSending = ref(false);
+				let hasSentCode = ref(false);
+				let subscriptions = ref({
+					oceaN_POLLUTION: false,
+					oiL_REPORT: false,
+					satellitE_IMAGES: false
+				});
+
+				let subscriptionNames = {
+					oceaN_POLLUTION: "海洋汙染事件",
+					oiL_REPORT: "影像油汙報告",
+					satellitE_IMAGES: "最新衛星影像"
+				};
+
+				async function initLIFF() {
+					await liff.init({ liffId, withLoginOnExternalBrowser: true });
+					const profile = await liff.getProfile();
+					userId.value = profile.userId;
+					userName.value = profile.displayName;
+					checkUserExists();
+				}
+
+				async function checkUserExists() {
+					try {
+						let res = await fetch(apiUrl + '/api/LineLogin/CheckUserCombineLine', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ LINE_ID: userId.value })
+						});
+						let data = await res.json();
+						isVerified.value = data.exists;
+
+						if (data.exists) {
+							fetchSubscriptions();
+						}
+					} catch (err) {
+						console.error('❌ 檢查使用者失敗:', err);
+					}
+				}
+
+				async function sendVerifyCode() {
+					if (!email.value) {
+						alert("請輸入有效的 Email");
+						return;
+					}
+					isSending.value = true;
+					try {
+						let res = await fetch(apiUrl + '/api/LineLogin/SendVerifyCode', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ EMAIL: email.value })
+						});
+						let data = await res.json();
+						if (data.success) {
+							hasSentCode.value = true;
+							alert("驗證碼已發送");
+						} else {
+							alert("發送失敗");
+						}
+					} catch (err) {
+						console.error('❌ 發送驗證碼失敗:', err);
+					}
+					isSending.value = false;
+				}
+
+				async function checkVerifyCode() {
+					if (!verifyCode.value) {
+						alert("請輸入驗證碼");
+						return;
+					}
+					try {
+						let res = await fetch(apiUrl + '/api/LineLogin/CheckVerifyCode', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({ EMAIL: email.value, CODE: verifyCode.value })
+						});
+						let data = await res.json();
+						if (data.success) {
+							saveUserInfo();
+						} else {
+							alert("驗證碼錯誤");
+						}
+					} catch (err) {
+						console.error('❌ 驗證碼失敗:', err);
+					}
+				}
+
+				async function saveUserInfo() {
+					await fetch(apiUrl + '/api/LineLogin/SaveUser', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ EMAIL: email.value, LINE_ID: userId.value, COMBINE_LINE: 1 })
+					});
+					isVerified.value = true;
+					fetchSubscriptions();
+				}
+
+				async function fetchSubscriptions() {
+					let res = await fetch(apiUrl + '/api/Subscription/Fetch', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ USER_ID: userId.value })
+					});
+					subscriptions.value = await res.json();
+				}
+
+				async function toggleSubscription(key) {
+					subscriptions.value[key] = !subscriptions.value[key];
+				}
+
+				initLIFF();
+				return { userName, email, verifyCode, isVerified, subscriptions, subscriptionNames, sendVerifyCode, checkVerifyCode, toggleSubscription };
+			}
+		}).mount("#app");
+	</script>
 </body>
 
 </html>

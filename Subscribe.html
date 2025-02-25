@@ -262,7 +262,7 @@
 					let res = await fetch(apiUrl + '/api/Subscription/Fetch', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ USER_ID: userId.value })
+						body: JSON.stringify({ LINE_ID: userId.value })
 					});
 					console.log(subscriptions.value);
 					const result = await res.json();

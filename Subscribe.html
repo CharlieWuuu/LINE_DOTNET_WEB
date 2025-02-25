@@ -262,6 +262,7 @@
 					});
 					console.log(subscriptions.value);
 					const result = await res.json();
+					console.log(result);
 					for (let key in subscriptions.value) {
 						subscriptions.value[key] = result[key];
 					}

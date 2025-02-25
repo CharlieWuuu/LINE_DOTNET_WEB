@@ -261,7 +261,10 @@
 						body: JSON.stringify({ USER_ID: userId.value })
 					});
 					console.log(subscriptions.value);
-					subscriptions.value = await res.json();
+					const result = await res.json();
+					for (let key in subscriptions.value) {
+						subscriptions.value[key] = result[key];
+					}
 					console.log(subscriptions.value);
 				}
 

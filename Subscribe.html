@@ -182,6 +182,7 @@
 							body: JSON.stringify({ LINE_ID: userId.value })
 						});
 						let data = await res.json();
+						console.log(data)
 						if (data.COMBINE_LINE == 1) {
 							// 自動儲存使用者登入紀錄
 							isVerified.value = true;

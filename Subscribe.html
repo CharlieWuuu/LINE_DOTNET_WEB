@@ -123,12 +123,12 @@
 		<div v-if="isVerified" class="subscriptionContainer">
 			<h1>請選擇欲訂閱的資訊</h1>
 			<div v-if="isVerified" class="subscriptionBtnContainer">
-				<div v-for="(status, key) in subscriptions" :key="key" class="subscriptionBtn">
+				<div v-for="(status, key) in subscriptions" :key="key" class="subscriptionBtn" @click="toggleSubscription(key)">
 					<p>{{ subscriptionNames[key] }}</p>
 					<span>{{ status ? '取消訂閱' : '訂閱' }}</span>
 				</div>
 				<div class="subscriptionBtn">
-					<p>分享此帳號</p>
+					<p @click="shareTargetPicker()">分享此帳號</p>
 				</div>
 			</div>
 		</div>
@@ -167,7 +167,13 @@
 					const profile = await liff.getProfile(); // 取得使用者的 LINE 資料
 					userId.value = profile.userId;
 					userName.value = profile.displayName;
-					checkUserExists(); // 檢查使用者是否已經註冊
+
+					// 檢查使用者是否已經註冊
+					if (checkUserExists()) {
+						LoginUser();
+					} else {
+						fetchSubscriptions();
+					}
 				}
 
 				async function checkUserExists() {
@@ -180,12 +186,12 @@
 						let data = await res.json();
 						if (data.COMBINE_LINE) {
 							// 自動儲存使用者登入紀錄
-							fetchSubscriptions();
 							isVerified.value = true;
 						}
 					} catch (err) {
 						console.error('❌ 檢查使用者失敗:', err);
 					}
+					return isVerified.value;
 				}
 
 				async function sendVerifyCode() {
@@ -258,6 +264,57 @@
 
 				async function toggleSubscription(key) {
 					subscriptions.value[key] = !subscriptions.value[key];
+				}
+
+				function shareTargetPicker() {
+					if (!liff.isApiAvailable('shareTargetPicker')) {
+						console.log("請檢查 Line 版本是否為 10.3.0 以上")
+						return;
+					}
+					const flexMessage = {
+						type: "flex",
+						altText: "衛星影像分析資訊平台",
+						contents: {
+							type: "bubble",
+							hero: {
+								type: "image",
+								url: url + "/images/OIL.png",
+								size: "full",
+								aspectRatio: "20:13",
+								aspectMode: "cover",
+								action: {
+									type: "uri",
+									uri: "https://line.me/ti/p/@070qbplr"
+								}
+							},
+							body: {
+								type: "box",
+								layout: "vertical",
+								contents: [
+									{
+										type: "text",
+										text: "衛星影像分析資訊平台",
+										weight: "bold",
+										size: "lg",
+										wrap: true,
+									},
+									{
+										type: "text",
+										text: "點擊查看更多資訊",
+										size: "sm",
+										color: "#666666",
+										wrap: true,
+									},
+								],
+								action: {
+									type: "uri",
+									uri: "https://line.me/ti/p/@070qbplr"
+								}
+							},
+						},
+					};
+
+					liff.shareTargetPicker([flexMessage], { isMultiple: true, });
 				}
 
 				initLIFF();

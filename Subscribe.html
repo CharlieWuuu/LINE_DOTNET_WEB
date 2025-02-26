@@ -256,7 +256,7 @@
 				}
 
 				async function LoginUser() {
-					await fetch(apiUrl + '/api/LineLogin/LoginUser', {
+					let res = await fetch(apiUrl + '/api/LineLogin/LoginUser', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({ LINE_ID: userId.value, LINE_DISPLAY_NAME: userName.value })

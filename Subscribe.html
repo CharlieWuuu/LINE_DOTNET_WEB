@@ -269,7 +269,6 @@
 				}
 
 				async function toggleSubscription(key) {
-					console.log(subscriptions.value);
 					subscriptions.value[key] = !subscriptions.value[key] ? 1 : 0;
 					var data = {
 						LINE_ID: userId.value,
@@ -277,25 +276,12 @@
 						OIL_REPORT: subscriptions.value.OIL_REPORT,
 						SATELLITE_IMAGES: subscriptions.value.SATELLITE_IMAGES,
 					};
-					console.log(data);
-
-
 
 					let res = await fetch(apiUrl + '/api/Subscription/Update', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify(data)
 					});
-					const text = await res.text(); // 獲取回應的純文字內容
-					console.log('回應內容:', text);
-					console.log(res);
-					const result = await res.json();
-					console.log(result);
-					for (let key in subscriptions.value) {
-						console.log(key, result[key], subscriptions.value[key]);
-						subscriptions.value[key] = result[key];
-					}
-					console.log(subscriptions.value);
 				}
 
 				function shareTargetPicker() {

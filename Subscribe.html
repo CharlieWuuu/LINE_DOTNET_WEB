@@ -275,7 +275,7 @@
 
 				async function toggleSubscription(key) {
 					console.log(subscriptions.value);
-					subscriptions.value[key] = !subscriptions.value[key];
+					subscriptions.value[key] = !subscriptions.value[key] ? 1 : 0;
 					var data = {
 						LINE_ID: userId.value,
 						OCEAN_POLLUTION: subscriptions.value.OCEAN_POLLUTION,

@@ -276,13 +276,12 @@
 				}
 
 				async function toggleSubscription(key) {
-					console.log(subscriptions.value);
-					subscriptions.value[key] = !subscriptions.value[key] ? 1 : 0;
+
 					var data = {
 						LINE_ID: userId.value,
-						OCEAN_POLLUTION: subscriptions.value.OCEAN_POLLUTION,
-						OIL_REPORT: subscriptions.value.OIL_REPORT,
-						SATELLITE_IMAGES: subscriptions.value.SATELLITE_IMAGES,
+						OCEAN_POLLUTION: key == "OCEAN_POLLUTION" ? subscriptions.value.OCEAN_POLLUTION : !subscriptions.value.OCEAN_POLLUTION,
+						OIL_REPORT: key == "OIL_REPORT" ? subscriptions.value.OIL_REPORT : !subscriptions.value.OIL_REPORT,
+						SATELLITE_IMAGES: key == "SATELLITE_IMAGES" ? subscriptions.value.SATELLITE_IMAGES : !subscriptions.value.SATELLITE_IMAGES
 					};
 					console.log(data);
 
@@ -292,8 +291,11 @@
 						body: JSON.stringify(data)
 					});
 
-					const result = await res.json();
-					console.log(result);
+					for (let key in subscriptions.value) {
+						console.log(key, result[key], subscriptions.value[key]);
+						subscriptions.value[key] = result[key];
+					}
+					console.log(subscriptions.value);
 				}
 
 				function shareTargetPicker() {

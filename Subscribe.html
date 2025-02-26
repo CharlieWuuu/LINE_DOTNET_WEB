@@ -276,16 +276,18 @@
 				async function toggleSubscription(key) {
 					console.log(subscriptions.value);
 					subscriptions.value[key] = !subscriptions.value[key];
+					var data = {
+						LINE_ID: userId.value,
+						OCEAN_POLLUTION: subscriptions.value.OCEAN_POLLUTION,
+						OIL_REPORT: subscriptions.value.OIL_REPORT,
+						SATELLITE_IMAGES: subscriptions.value.SATELLITE_IMAGES,
+					};
+					console.log(data);
 
 					let res = await fetch(apiUrl + '/api/Subscription/Update', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({
-							LINE_ID: userId.value,
-							OCEAN_POLLUTION: subscriptions.value.OCEAN_POLLUTION,
-							OIL_REPORT: subscriptions.value.OIL_REPORT,
-							SATELLITE_IMAGES: subscriptions.value.SATELLITE_IMAGES,
-						})
+						body: JSON.stringify(data)
 					});
 
 					const result = await res.json();

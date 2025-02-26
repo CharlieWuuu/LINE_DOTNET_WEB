@@ -76,6 +76,11 @@
 						cursor: pointer;
 					}
 
+					&.isChanging {
+						background-color: rgba(255, 255, 255, 0.2);
+						cursor: not-allowed;
+					}
+
 					p {
 						font-size: 22px;
 					}
@@ -126,7 +131,7 @@
 		<div v-if="isVerified" class="subscriptionContainer">
 			<h1>請選擇欲訂閱的資訊</h1>
 			<div class="subscriptionBtnContainer">
-				<div v-for="(status, key) in subscriptions" :key="key" class="subscriptionBtn" @click="toggleSubscription(key)">
+				<div v-for="(status, key) in subscriptions" :key="key" class="subscriptionBtn" @click="toggleSubscription(key)" :class="isChangingSubscription ? 'isChanging' : '' ">
 					<p>{{ subscriptionNames[key] }}</p>
 					<span>{{ status == 1 ? '已訂閱' : '未訂閱' }}</span>
 				</div>
@@ -143,6 +148,7 @@
 		createApp({
 			setup() {
 				const apiUrl = 'https://line-dotnet-api.onrender.com';
+				const url = 'https://charliewuuu.github.io/LINE_DOTNET_WEB/Subscribe';
 				const liffId = '2006807429-YpKnwjVL';
 
 				let userId = ref("");
@@ -152,6 +158,7 @@
 				let isVerified = ref(false);
 				let isSending = ref(false);
 				let hasSentCode = ref(false);
+				let isChangingSubscription = ref(false);
 				let subscriptions = ref({
 					OCEAN_POLLUTION: 0,
 					OIL_REPORT: 0,

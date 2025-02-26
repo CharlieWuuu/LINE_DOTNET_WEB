@@ -155,13 +155,13 @@
 				let subscriptions = ref({
 					OCEAN_POLLUTION: 0,
 					OIL_REPORT: 0,
-					SATELLITE_IMAGES: 0
+					SATELLITE: 0
 				});
 
 				let subscriptionNames = {
 					OCEAN_POLLUTION: "海洋汙染事件",
 					OIL_REPORT: "影像油汙報告",
-					SATELLITE_IMAGES: "最新衛星影像"
+					SATELLITE: "最新衛星影像"
 				};
 
 				// 進入畫面時自動登入 LIFF
@@ -274,7 +274,7 @@
 						LINE_ID: userId.value,
 						OCEAN_POLLUTION: subscriptions.value.OCEAN_POLLUTION,
 						OIL_REPORT: subscriptions.value.OIL_REPORT,
-						SATELLITE_IMAGES: subscriptions.value.SATELLITE_IMAGES,
+						SATELLITE: subscriptions.value.SATELLITE,
 					};
 
 					let res = await fetch(apiUrl + '/api/Subscription/Update', {

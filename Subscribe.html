@@ -284,6 +284,7 @@
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify(data)
 					});
+					console.log(res);
 					const result = await res.json();
 					console.log(result);
 					for (let key in subscriptions.value) {

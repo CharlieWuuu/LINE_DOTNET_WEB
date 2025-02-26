@@ -179,32 +179,29 @@
 					userName.value = profile.displayName;
 
 					// 檢查使用者是否已經註冊
-					let isUserExists = await checkUserExists();
-					if (isUserExists) {
-						LoginUser();
-					}
+					LoginUser();
 				}
 
-				async function checkUserExists() {
-					try {
-						let res = await fetch(apiUrl + '/api/LineLogin/CheckUserCombineLine', {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({ LINE_ID: userId.value })
-						});
-						let data = await res.json();
-						if (data) {
-							// 自動儲存使用者登入紀錄
-							isVerified.value = true;
-							return true;
-						} else {
-							return false;
-						}
-					} catch (err) {
-						console.error('❌ 檢查使用者失敗:', err);
-						return false;
-					}
-				}
+				// async function checkUserExists() {
+				// 	try {
+				// 		let res = await fetch(apiUrl + '/api/LineLogin/CheckUserCombineLine', {
+				// 			method: 'POST',
+				// 			headers: { 'Content-Type': 'application/json' },
+				// 			body: JSON.stringify({ LINE_ID: userId.value })
+				// 		});
+				// 		let data = await res.json();
+				// 		if (data) {
+				// 			// 自動儲存使用者登入紀錄
+				// 			isVerified.value = true;
+				// 			return true;
+				// 		} else {
+				// 			return false;
+				// 		}
+				// 	} catch (err) {
+				// 		console.error('❌ 檢查使用者失敗:', err);
+				// 		return false;
+				// 	}
+				// }
 
 				async function sendVerifyCode() {
 					if (!email.value) {
@@ -259,8 +256,12 @@
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({ LINE_ID: userId.value, LINE_DISPLAY_NAME: userName.value })
 					});
-					isVerified.value = true;
-					fetchSubscriptions();
+					let data = await res.json();
+					if (data) {
+						// 自動儲存使用者登入紀錄
+						isVerified.value = true;
+						fetchSubscriptions();
+					}
 				}
 
 				async function fetchSubscriptions() {

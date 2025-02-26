@@ -176,11 +176,9 @@
 					if (isUserExists) {
 						LoginUser();
 					}
-					console.log(isUserExists);
 				}
 
 				async function checkUserExists() {
-					console.log(userId.value);
 					try {
 						let res = await fetch(apiUrl + '/api/LineLogin/CheckUserCombineLine', {
 							method: 'POST',
@@ -227,7 +225,6 @@
 				}
 
 				async function checkVerifyCode() {
-					console.log(email.value, typeof verifyCode.value);
 					if (!verifyCode.value) {
 						alert("請輸入驗證碼");
 						return;
@@ -265,14 +262,10 @@
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({ LINE_ID: userId.value })
 					});
-					console.log(subscriptions.value);
 					const result = await res.json();
-					console.log(result);
 					for (let key in subscriptions.value) {
-						console.log(key, result[key], subscriptions.value[key]);
 						subscriptions.value[key] = result[key];
 					}
-					console.log(subscriptions.value);
 				}
 
 				async function toggleSubscription(key) {

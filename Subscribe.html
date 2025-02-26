@@ -237,12 +237,12 @@
 						let res = await fetch(apiUrl + '/api/LineLogin/CheckVerifyCode', {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({
+							body: {
 								EMAIL: email.value,
 								CODE: verifyCode.value,
 								LINE_ID: userId.value,
 								LINE_DISPLAY_NAME: userName.value
-							})
+							}
 						});
 						let data = await res.json();
 						if (data) {

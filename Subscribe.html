@@ -279,14 +279,15 @@
 					};
 					console.log(data);
 
-					const text = await res.text(); // 獲取回應的純文字內容
-					console.log('回應內容:', text);
+
 
 					let res = await fetch(apiUrl + '/api/Subscription/Update', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify(data)
 					});
+					const text = await res.text(); // 獲取回應的純文字內容
+					console.log('回應內容:', text);
 					console.log(res);
 					const result = await res.json();
 					console.log(result);
